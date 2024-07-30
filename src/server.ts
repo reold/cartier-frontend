@@ -4,7 +4,8 @@ if (
 ) {
   window["cartier-server-url"] = "http://localhost:8000" as string;
 } else {
-  window["cartier-server-url"] = "https://cartier-beta.glitch.me" as string;
+  window["cartier-server-url"] =
+    "https://cartier-backend-1.onrender.com" as string;
 }
 
 export const requests = {

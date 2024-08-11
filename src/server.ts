@@ -54,7 +54,8 @@ export const requests = {
   },
   getStreamPlaylist: async (key: string): Promise<[boolean, Blob, string]> => {
     let resp = await fetch(
-      `${window["cartier-server-url"]}/api/stream?key=${key}`
+      `${window["cartier-server-url"]}/api/stream?key=${key}`,
+      { cache: "no-store" }
     );
 
     return [

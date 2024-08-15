@@ -1,7 +1,6 @@
 import { writable, get } from "svelte/store";
 import { requests } from "./server";
 import FsWorker from "./fsWorker?worker";
-import { notify } from "./App.svelte";
 
 export enum TabKind {
   PLAYLISTS,

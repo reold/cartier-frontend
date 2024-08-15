@@ -9,6 +9,7 @@ export type QueueTrack = {
 export const PlayerState = writable({
   loaded: false,
   queue: [] as QueueTrack[],
+  q_index: -1 as number,
   playback: {
     handle: {} as HTMLAudioElement,
     id: "",
@@ -65,10 +66,7 @@ export const usePlayer = {
     });
 
     const onEnd = () => {
-      let playerstate = get(PlayerState);
-
-      if (playerstate.queue.length > 0) {
-        usePlayer.next();
+      if (usePlayer.next()) {
         usePlayer.play();
       }
     };
@@ -76,6 +74,9 @@ export const usePlayer = {
     playerstate.playback.handle.addEventListener("ended", onEnd);
 
     navigator.mediaSession.setActionHandler("nexttrack", onEnd);
+    navigator.mediaSession.setActionHandler("previoustrack", () => {
+      usePlayer.previous() ? usePlayer.play() : false;
+    });
     navigator.mediaSession.setActionHandler("pause", usePlayer.pause);
     navigator.mediaSession.setActionHandler("play", usePlayer.resume);
   },
@@ -101,11 +102,13 @@ export const usePlayer = {
   next: () => {
     let playerstate = get(PlayerState);
 
-    let queueItem = playerstate.queue[0];
+    let queueItem = playerstate.queue[playerstate.q_index + 1];
 
     if (!queueItem) {
       return false;
     }
+
+    playerstate.q_index++;
 
     if (playerstate.playback.playing) {
       usePlayer.pause();
@@ -114,7 +117,28 @@ export const usePlayer = {
     playerstate.playback.name = queueItem.name;
     playerstate.playback.id = queueItem.id;
 
-    playerstate.queue.splice(0, 1);
+    PlayerState.set(playerstate);
+
+    return true;
+  },
+
+  previous: () => {
+    let playerstate = get(PlayerState);
+
+    let prevQItem = playerstate.queue[playerstate.q_index - 1];
+
+    if (!prevQItem) {
+      return false;
+    }
+
+    playerstate.q_index--;
+
+    if (playerstate.playback.playing) {
+      usePlayer.pause();
+    }
+
+    playerstate.playback.name = prevQItem.name;
+    playerstate.playback.id = prevQItem.id;
 
     PlayerState.set(playerstate);
 

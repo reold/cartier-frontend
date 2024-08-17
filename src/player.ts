@@ -152,9 +152,17 @@ export const usePlayer = {
 
       for (let track of cartierfile.tracks) {
         if (track.id == id) {
-          playerstate.queue = insert
-            ? [{ id, name: track.name }, ...playerstate.queue]
-            : [...playerstate.queue, { id, name: track.name }];
+          if (insert) {
+            playerstate.queue.splice(playerstate.q_index + 1, 0, {
+              id,
+              name: track.name,
+            });
+          } else {
+            playerstate.queue = [
+              ...playerstate.queue,
+              { id, name: track.name },
+            ];
+          }
 
           break;
         }
@@ -162,6 +170,7 @@ export const usePlayer = {
 
       PlayerState.set(playerstate);
     },
+
     addPlaylist: (id: string, insert: boolean = false) => {
       let cartierfile = get(CartierFile);
 

@@ -6,8 +6,17 @@
   import { tweened } from "svelte/motion";
 
   let progress = tweened(0, { duration: 1000 });
+  const handleUpdateProgress = (newProgress: number) => {
+    $PlayerState.playback.handle.currentTime =
+      (newProgress / 100) * $PlayerState.playback.dur;
+  };
+
+  window["updateTime"] = (percent: number) => {
+    handleUpdateProgress(percent);
+  };
 
   $: {
+    $PlayerState.playback.time;
     progress.set(
       ($PlayerState.playback.time / $PlayerState.playback.dur) * 100
     );
@@ -103,14 +112,21 @@
     </button>
   </div>
   <div
-    class="bottom-0 h-[2px] bg-primary"
+    class="bottom-0 h-[2px] bg-primary absolute"
     style="width: {($PlayerState.playback.time / $PlayerState.playback.dur) *
       100}%"
+  />
+
+  <button
+    class="bottom-[-0.25em] rounded-full bg-primary absolute p-0 h-[0.5em] w-[0.5em]"
+    style="left: calc({($PlayerState.playback.time /
+      $PlayerState.playback.dur) *
+      100}% - 0.25em)"
   />
 </div>
 
 <style>
   .svg-icon {
-    @apply bg-transparent text-white;
+    @apply bg-transparent text-white p-1.5;
   }
 </style>

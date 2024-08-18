@@ -5,15 +5,15 @@
 
   import { tweened } from "svelte/motion";
 
-  let progress = tweened(0, { duration: 1000 });
-  const handleUpdateProgress = (newProgress: number) => {
+  let playerDiv: HTMLDivElement;
+
+  let progress = tweened(0, { duration: 100 });
+
+  const updateProgress = (newProgress: number) => {
     $PlayerState.playback.handle.currentTime =
       (newProgress / 100) * $PlayerState.playback.dur;
   };
-
-  window["updateTime"] = (percent: number) => {
-    handleUpdateProgress(percent);
-  };
+  let seeking = false;
 
   $: {
     $PlayerState.playback.time;
@@ -25,7 +25,8 @@
 
 <div
   style={$PlayerState.loaded ? "" : "visibility: hidden"}
-  class="ring-1 ring-border rounded-t-md w-[95%] h-[10vh] absolute bottom-[11vh]"
+  class="ring-1 ring-border rounded-t-md w-[95%] h-[10vh] absolute bottom-[11vh] overflow-x-clip"
+  bind:this={playerDiv}
 >
   <div
     class="bg-foreground rounded-t-md w-full h-full grid grid-cols-10 items-center justify-center gap-1"
@@ -113,15 +114,33 @@
   </div>
   <div
     class="bottom-0 h-[2px] bg-primary absolute"
-    style="width: {($PlayerState.playback.time / $PlayerState.playback.dur) *
-      100}%"
+    style="width: {$progress}%"
   />
 
   <button
     class="bottom-[-0.25em] rounded-full bg-primary absolute p-0 h-[0.5em] w-[0.5em]"
-    style="left: calc({($PlayerState.playback.time /
-      $PlayerState.playback.dur) *
-      100}% - 0.25em)"
+    style={seeking ? "display: none;" : `left: calc(${$progress}% - 0.25em)`}
+    on:touchstart={() => {
+      seeking = true;
+      usePlayer.pause();
+    }}
+    on:touchmove={(e) => {
+      if (!seeking) {
+        return;
+      }
+      let touchInfo = e.touches[0];
+      const x = touchInfo.clientX;
+
+      let seekProgress =
+        ((x - playerDiv.offsetLeft) / playerDiv.clientWidth) * 100;
+
+      seekProgress = Math.min(100, Math.max(0, seekProgress));
+      updateProgress(seekProgress);
+    }}
+    on:touchend={() => {
+      seeking = false;
+      usePlayer.resume();
+    }}
   />
 </div>
 

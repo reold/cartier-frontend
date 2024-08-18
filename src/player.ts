@@ -79,6 +79,11 @@ export const usePlayer = {
     });
     navigator.mediaSession.setActionHandler("pause", usePlayer.pause);
     navigator.mediaSession.setActionHandler("play", usePlayer.resume);
+    navigator.mediaSession.setActionHandler("seekto", (e) => {
+      if (e.seekTime) {
+        playerstate.playback.handle.currentTime = e.seekTime;
+      }
+    });
   },
 
   pause: () => {

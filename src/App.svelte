@@ -32,7 +32,7 @@
 
   import { slide } from "svelte/transition";
 
-  import { AppState, useApp } from "./store";
+  import { AppState, TabKind, useApp } from "./store";
 
   const handleUserid = async (userid: string) => {
     await useApp.login(userid);
@@ -42,10 +42,14 @@
     if (online) {
       $AppState.offline = false;
     } else {
-      notify("Cartier is running offline", false, 5);
+      notify("Cartier Manager is running offline", false, 4);
     }
 
-    useApp.init();
+    useApp.init(() => {
+      if ($AppState.offline == true) {
+        $AppState.view.tab = TabKind.DOWNLOADED;
+      }
+    });
   };
 </script>
 

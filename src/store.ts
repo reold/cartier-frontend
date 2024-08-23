@@ -68,6 +68,7 @@ export const OPFS = writable({
   },
   workerLock: undefined as undefined | Promise<void>,
 });
+
 export const CartierFile = writable({
   playlists: [] as BasicPlaylist[],
   tracks: [] as BasicTrack[],
@@ -170,7 +171,7 @@ export const useApp = {
     });
   },
 
-  init: async () => {
+  init: async (callback: () => void) => {
     await useApp.initCartierFile();
 
     let appstate = get(AppState);
@@ -178,10 +179,12 @@ export const useApp = {
 
     if (cartierfile.data && Object.keys(cartierfile.data).length > 0) {
       if (appstate.offline) {
-        useApp.login("", cartierfile.data);
+        await useApp.login("", cartierfile.data);
       } else {
-        useApp.login(cartierfile.data.user.id);
+        await useApp.login(cartierfile.data.user.id);
       }
     }
+
+    callback();
   },
 };

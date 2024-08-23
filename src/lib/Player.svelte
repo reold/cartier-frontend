@@ -17,15 +17,17 @@
 
   $: {
     $PlayerState.playback.time;
-    progress.set(
-      ($PlayerState.playback.time / $PlayerState.playback.dur) * 100
-    );
+    if (!seeking) {
+      progress.set(
+        ($PlayerState.playback.time / $PlayerState.playback.dur) * 100
+      );
+    }
   }
 </script>
 
 <div
   style={$PlayerState.loaded ? "" : "visibility: hidden"}
-  class="ring-1 ring-border rounded-t-md w-[95%] h-[10vh] absolute bottom-[11vh] overflow-x-clip"
+  class="ring-1 ring-border rounded-t-md w-[95%] h-[10vh] absolute bottom-[11vh]"
   bind:this={playerDiv}
 >
   <div
@@ -118,11 +120,12 @@
   />
 
   <button
-    class="bottom-[-0.25em] rounded-full bg-primary absolute p-0 h-[0.5em] w-[0.5em]"
-    style={seeking ? "display: none;" : `left: calc(${$progress}% - 0.25em)`}
+    class="bottom-[-0.25em] rounded-full bg-primary absolute p-0 h-[0.5em] w-[0.5em] transition-transform duration-1000 {seeking
+      ? 'scale-150'
+      : ''}"
+    style="left: calc({$progress}% - 0.25em)"
     on:touchstart={() => {
       seeking = true;
-      usePlayer.pause();
     }}
     on:touchmove={(e) => {
       if (!seeking) {
@@ -134,12 +137,11 @@
       let seekProgress =
         ((x - playerDiv.offsetLeft) / playerDiv.clientWidth) * 100;
 
-      seekProgress = Math.min(100, Math.max(0, seekProgress));
-      updateProgress(seekProgress);
+      $progress = Math.min(100, Math.max(0, seekProgress));
     }}
     on:touchend={() => {
+      updateProgress($progress);
       seeking = false;
-      usePlayer.resume();
     }}
   />
 </div>

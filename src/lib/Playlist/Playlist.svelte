@@ -4,9 +4,9 @@
   import PlaylistCard from "./PlaylistCard.svelte";
 
   import { AppState, CartierFile, Socket, TabKind } from "../../store";
-  import type { Playlist } from "../../store";
+  import type { BasicPlaylist, Playlist } from "../../store";
 
-  import { slide } from "svelte/transition";
+  import { scale } from "svelte/transition";
   import { tweened } from "svelte/motion";
   import { circIn } from "svelte/easing";
   import { onMount } from "svelte";
@@ -16,6 +16,9 @@
     left: tweened(0, { duration: 50, easing: circIn }),
     width: tweened(0, { duration: 50, easing: circIn }),
   };
+
+  let searchContent: string = "";
+  let searchResults: BasicPlaylist[];
 
   let undownloadedPlaylists: Playlist[] = [];
 
@@ -35,6 +38,23 @@
       }
 
       return !isStored;
+    });
+  };
+
+  const handleSearch = () => {
+    searchContent = searchContent.toLowerCase();
+
+    let resultTracks = $CartierFile.tracks.filter((track) => {
+      return track.name.toLowerCase().includes(searchContent);
+    });
+
+    let resultTrackIds = resultTracks.map((resTrack) => {
+      return resTrack.id;
+    });
+
+    searchResults = $CartierFile.playlists.filter((playlist) => {
+      if (playlist.name.toLowerCase().includes(searchContent)) return true;
+      return playlist.tracks.some((id) => resultTrackIds.includes(id));
     });
   };
 
@@ -71,38 +91,6 @@
   tabSwitchDivConfig.width.subscribe((width) => {
     if (tabSwitchDiv) tabSwitchDiv.style.width = `${width}px`;
   });
-
-  const handleSocketIO = () => {
-    return;
-    if ($Socket.loaded) return;
-
-    const script = document.createElement("script");
-    script.src = "https://cdn.socket.io/4.7.5/socket.io.min.js";
-    script.integrity =
-      "sha384-2huaZvOR9iDzHqslqwpR87isEmrfxqyWOF7hr7BY6KG0+hVKLoEXMPUJw3ynWuhO";
-    script.crossOrigin = "anonymous";
-
-    document.head.appendChild(script);
-
-    script.onload = () => {
-      $Socket.io = io(window["cartier-server-url"]);
-      $Socket.loaded = true;
-
-      $Socket.io.on("connect", () => {
-        console.info(`live connection opened (${$Socket.io.id})`);
-
-        $Socket.io.emit("login", {
-          id: $AppState.user.id,
-          name: $AppState.user.display_name,
-        });
-      });
-      $Socket.io.on("disconnect", () => {
-        console.info("live connection ended");
-      });
-    };
-  };
-
-  onMount(handleSocketIO);
 </script>
 
 <div
@@ -130,13 +118,34 @@
   </div>
   <div
     class="flex flex-col justify-center items-center w-full space-y-2 pb-[11vh] relative"
-    in:slide={{ duration: 1000 }}
+    transition:scale={{ duration: 500 }}
   >
+    {#if $AppState.view.tab == TabKind.DOWNLOADED}
+      <div
+        class="grid grid-cols-10 w-[95%] gap-1 focus-within:mt-[2vh] duration-500 transition-all"
+      >
+        <input
+          type="text"
+          autocomplete="off"
+          autocapitalize="none"
+          bind:value={searchContent}
+          on:input={handleSearch}
+          placeholder="search downloaded tracks"
+          class="col-span-9"
+        />
+        <button class="col-span-1 bg-red-500 text-white">x</button>
+      </div>
+    {/if}
+
     {#if $AppState.view.tab == TabKind.DOWNLOADED}
       {#if !$CartierFile.playlists || $CartierFile.playlists.length == 0}
         <p class="pt-10">Nothing downloaded! 😕</p>
-      {:else}
+      {:else if searchContent == ""}
         {#each $CartierFile.playlists || [] as playlist}
+          <BasicPlaylistCard {playlist} />
+        {/each}
+      {:else}
+        {#each searchResults || [] as playlist}
           <BasicPlaylistCard {playlist} />
         {/each}
       {/if}

@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { onMount } from "svelte";
-
   import { notify } from "../../App.svelte";
   import { CartierFile } from "../../store";
   import type { BasicPlaylist } from "../../store";
@@ -10,7 +8,8 @@
   export let playlist: BasicPlaylist;
   let tracks = [] as { id: string; name: string }[];
 
-  onMount(() => {
+  $: {
+    tracks = [];
     playlist.tracks.forEach((trackid) => {
       for (let t of $CartierFile.tracks) {
         if (t.id == trackid) {
@@ -19,7 +18,7 @@
         }
       }
     });
-  });
+  }
 
   const handleRemovePlaylist = () => {
     let playlists = $CartierFile.playlists;

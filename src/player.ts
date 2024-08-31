@@ -4,6 +4,7 @@ import { writable, get } from "svelte/store";
 export type QueueTrack = {
   id: string;
   name: string;
+  source?: string;
 };
 
 export const PlayerState = writable({
@@ -17,6 +18,7 @@ export const PlayerState = writable({
     dur: 1,
     time: 0,
     playing: false,
+    source: "",
   },
 });
 
@@ -121,6 +123,7 @@ export const usePlayer = {
 
     playerstate.playback.name = queueItem.name;
     playerstate.playback.id = queueItem.id;
+    playerstate.playback.source = queueItem.source;
 
     PlayerState.set(playerstate);
 
@@ -144,6 +147,7 @@ export const usePlayer = {
 
     playerstate.playback.name = prevQItem.name;
     playerstate.playback.id = prevQItem.id;
+    playerstate.playback.source = prevQItem.source;
 
     PlayerState.set(playerstate);
 
@@ -151,7 +155,7 @@ export const usePlayer = {
   },
 
   queue: {
-    addTrack: (id: string, insert: boolean = false) => {
+    addTrack: (id: string, source: string, insert: boolean = false) => {
       let playerstate = get(PlayerState);
       let cartierfile = get(CartierFile);
 
@@ -161,11 +165,12 @@ export const usePlayer = {
             playerstate.queue.splice(playerstate.q_index + 1, 0, {
               id,
               name: track.name,
+              source,
             });
           } else {
             playerstate.queue = [
               ...playerstate.queue,
-              { id, name: track.name },
+              { id, name: track.name, source },
             ];
           }
 
@@ -187,7 +192,7 @@ export const usePlayer = {
       if (insert) playlist.tracks.reverse();
 
       playlist.tracks.forEach((id) => {
-        usePlayer.queue.addTrack(id, insert);
+        usePlayer.queue.addTrack(id, playlist.name, insert);
       });
     },
   },

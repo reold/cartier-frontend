@@ -34,7 +34,10 @@ self.onmessage = async (
   }
 
   console.log(
-    `[FS-WORKER]: ${mode} -ing\n${content?.slice(0, 50)}...\nto: ${path}`
+    `[FS-WORKER]: ${mode} -ing for ${id}\n${content?.slice(
+      0,
+      50
+    )}...\nto: ${path}`
   );
 
   let root = await navigator.storage.getDirectory();

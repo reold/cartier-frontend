@@ -12,6 +12,6 @@
   {#if $AppState.view.tab == TabKind.SETTINGS}
     <Settings />
   {/if}
-  <Player />
   <NavBar />
+  <Player />
 </div>

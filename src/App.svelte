@@ -30,8 +30,6 @@
   import WakeUp from "./lib/WakeUp.svelte";
   import Tab from "./common/Tab.svelte";
 
-  import { slide } from "svelte/transition";
-
   import { AppState, TabKind, useApp } from "./store";
 
   const handleUserid = async (userid: string) => {
@@ -76,7 +74,6 @@
     <div
       class="absolute left-0 top-[1em] w-full flex flex-col items-center justify-center space-y-1 text-xs"
       bind:this={notifyEle}
-      transition:slide={{ duration: 10000 }}
     />
   </div>
 </main>

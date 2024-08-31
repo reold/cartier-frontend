@@ -3,7 +3,7 @@
 
   import PlaylistCard from "./PlaylistCard.svelte";
 
-  import { AppState, CartierFile, Socket, TabKind } from "../../store";
+  import { AppState, CartierFile, TabKind } from "../../store";
   import type { BasicPlaylist, Playlist } from "../../store";
 
   import { scale } from "svelte/transition";
@@ -94,7 +94,7 @@
 </script>
 
 <div
-  class="h-[82vh] overflow-y-scroll w-[100vw]"
+  class="h-[100vh] overflow-y-scroll w-[100vw]"
   style={$AppState.view.tab in [TabKind.PLAYLISTS, TabKind.DOWNLOADED]
     ? ""
     : "display: none"}
@@ -117,7 +117,7 @@
     >
   </div>
   <div
-    class="flex flex-col justify-center items-center w-full space-y-2 pb-[11vh] relative"
+    class="flex flex-col justify-center items-center w-full space-y-2 pb-[25vh] relative"
     transition:scale={{ duration: 500 }}
   >
     {#if $AppState.view.tab == TabKind.DOWNLOADED}

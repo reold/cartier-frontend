@@ -84,7 +84,7 @@
 </script>
 
 <div
-  class="h-[82vh] overflow-y-scroll w-[100vw] flex flex-col items-center justify-center"
+  class="h-[100vh] overflow-y-scroll w-[100vw] flex flex-col items-center justify-center pb-[15vh]"
 >
   <table class="text-sm ring-1 ring-border rounded-md min-w-[95vw]">
     <thead class="text-xl"><th>parameter</th><th>value</th></thead>

@@ -82,11 +82,15 @@
         // new downloads (not stored)
         await useOPFS.write(`tracks/${id}.mp3`, blob);
 
+        const trackInfo = $info.tracks.find((track) => track.id == id) || {
+          name: "unknown",
+        };
+
         cartierfile.tracks = [
           ...cartierfile.tracks,
           {
             id,
-            name: $info.tracks.find((track) => track.id == id).name,
+            name: trackInfo.name,
             dependants: [],
           },
         ];

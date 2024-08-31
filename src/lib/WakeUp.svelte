@@ -2,7 +2,6 @@
   import { onMount } from "svelte";
   import { requests } from "../server";
   import { writable } from "svelte/store";
-  import { notify } from "../App.svelte";
 
   import Dialog from "./Dialog.svelte";
 
@@ -20,7 +19,6 @@
         handleWakeup(true);
       })
       .catch((err) => {
-        notify(`servers are unreachable (${err})`);
         $wakeUpInfo["step"] = "servers are unreachable (reload?)";
         handleWakeup(false);
       });

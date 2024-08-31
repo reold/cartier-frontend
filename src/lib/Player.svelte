@@ -8,30 +8,39 @@
   let playerDiv: HTMLDivElement;
 
   let progress = tweened(0, { duration: 100 });
+  let timeStr = "";
 
   const updateProgress = (newProgress: number) => {
     $PlayerState.playback.handle.currentTime =
       (newProgress / 100) * $PlayerState.playback.dur;
   };
-  let seeking = false;
+
+  let seekInfo = {
+    is: false,
+    startX: 0,
+    startProgress: 0,
+  };
 
   $: {
     $PlayerState.playback.time;
-    if (!seeking) {
-      progress.set(
-        ($PlayerState.playback.time / $PlayerState.playback.dur) * 100
-      );
+    let time = $PlayerState.playback.time;
+    let minute = (time / 60) | 0;
+    let second = time % 60 | 0;
+
+    timeStr = `${minute == 0 ? "" : `${minute}:`}${minute == 0 ? `${second}s` : second < 10 ? `0${second}` : second}`;
+    if (!seekInfo.is) {
+      progress.set((time / $PlayerState.playback.dur) * 100);
     }
   }
 </script>
 
 <div
   style={$PlayerState.loaded ? "" : "visibility: hidden"}
-  class="ring-1 ring-border rounded-t-md w-[95%] h-[10vh] absolute bottom-[11vh]"
+  class="ring-1 ring-border rounded-md shadow-md shadow-black w-[95%] h-[10vh] absolute bottom-[13vh]"
   bind:this={playerDiv}
 >
   <div
-    class="bg-foreground rounded-t-md w-full h-full grid grid-cols-10 items-center justify-center gap-1"
+    class="bg-foreground/50 backdrop-blur-3xl rounded-t-md w-full h-full grid grid-cols-10 items-center justify-center gap-1"
   >
     <button
       on:click={() => {
@@ -58,7 +67,14 @@
         />
       </svg>
     </button>
-    <p class="truncate col-span-7">{$PlayerState.playback.name}</p>
+    <div class="col-span-7 flex flex-col">
+      <p class="truncate font-black">
+        {$PlayerState.playback.name}
+      </p>
+      <p class="text-xs truncate">
+        {timeStr} - <i>{$PlayerState.playback.source || "unknown source"}</i>
+      </p>
+    </div>
     {#if $PlayerState.playback.playing}
       <button on:click={usePlayer.pause} class="col-span-1 svg-icon"
         ><svg
@@ -115,35 +131,36 @@
     </button>
   </div>
   <div
-    class="bottom-0 h-[2px] bg-primary absolute"
-    style="width: {$progress}%"
-  />
-
-  <button
-    class="bottom-[-0.25em] rounded-full bg-primary absolute p-0 h-[0.5em] w-[0.5em] transition-transform duration-1000 {seeking
-      ? 'scale-150'
-      : ''}"
-    style="left: calc({$progress}% - 0.25em)"
-    on:touchstart={() => {
-      seeking = true;
+    class="top-0 h-[5px] w-[100%] absolute bg-white/5"
+    on:touchstart={(e) => {
+      seekInfo.is = true;
+      seekInfo.startX = e.touches[0].clientX;
+      seekInfo.startProgress = $progress;
     }}
     on:touchmove={(e) => {
-      if (!seeking) {
+      if (!seekInfo.is) {
         return;
       }
       let touchInfo = e.touches[0];
-      const x = touchInfo.clientX;
+      const deltaX = touchInfo.clientX - seekInfo.startX;
 
       let seekProgress =
-        ((x - playerDiv.offsetLeft) / playerDiv.clientWidth) * 100;
+        seekInfo.startProgress + (deltaX / playerDiv.clientWidth) * 100;
 
       $progress = Math.min(100, Math.max(0, seekProgress));
     }}
     on:touchend={() => {
       updateProgress($progress);
-      seeking = false;
+      seekInfo.is = false;
     }}
-  />
+  >
+    <div
+      class="h-[100%] bg-primary rounded-t-md {seekInfo.is
+        ? 'animate-pulse'
+        : ''}"
+      style="width: {$progress}%"
+    />
+  </div>
 </div>
 
 <style>

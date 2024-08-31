@@ -38,12 +38,14 @@ input[type="checkbox"] {
   @apply w-5 aspect-square m-auto;
 }
 
-button {
-  @apply bg-primary text-black p-2 text-base rounded-md duration-200 transition-all;
-}
+@layer base {
+  button {
+    @apply bg-primary text-black p-2 text-base rounded-md duration-200 transition-all;
+  }
 
-button:disabled {
-  @apply bg-border text-white;
+  button:disabled {
+    @apply bg-border text-white;
+  }
 }
 
 .svg-icon {

@@ -4,10 +4,13 @@
 
 {#if $AppState["logged"]}
   <div
-    class="container flex flex-row justify-around items-center h-[11vh] bg-gradient-to-t from-background to-border w-[95vw] rounded-b-xl ring-1 ring-border py-5"
+    class="absolute bottom-0 container flex flex-row justify-around items-center h-[12vh] pb-[3vh] backdrop-blur-xl bg-background/80 rounded-t-lg"
   >
     <button
-      class="flex flex-col items-center justify-center bg-transparent text-white text-xs"
+      class="flex flex-col items-center justify-center bg-transparent text-xs {$AppState
+        .view.tab == TabKind.PLAYLISTS
+        ? 'text-primary'
+        : 'text-white'}"
       on:click={() => {
         $AppState.view.tab = TabKind.PLAYLISTS;
       }}
@@ -15,7 +18,7 @@
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"
         fill="currentColor"
-        class="w-[3em]"
+        class="w-[2.5em]"
       >
         <path
           d="M11.47 3.841a.75.75 0 0 1 1.06 0l8.69 8.69a.75.75 0 1 0 1.06-1.061l-8.689-8.69a2.25 2.25 0 0 0-3.182 0l-8.69 8.69a.75.75 0 1 0 1.061 1.06l8.69-8.689Z"
@@ -27,7 +30,10 @@
       home</button
     >
     <button
-      class="flex flex-col items-center justify-center bg-transparent text-white text-xs"
+      class="flex flex-col items-center justify-center bg-transparent text-xs {$AppState
+        .view.tab == TabKind.ACCOUNT
+        ? 'text-primary'
+        : 'text-white'}"
       on:click={() => {
         $AppState.view.tab = TabKind.ACCOUNT;
       }}
@@ -37,7 +43,7 @@
           loading="lazy"
           src={$AppState["user"]["images"][0]["url"]}
           alt={`${$AppState["user"]["display_name"]}'s profile picture`}
-          class="rounded-full w-[4em] ring-border ring-1 aspect-square"
+          class="rounded-full w-[3em] ring-border ring-1 aspect-square"
         />
       {:else}
         open
@@ -45,7 +51,10 @@
       account
     </button>
     <button
-      class="flex flex-col items-center justify-center bg-transparent text-white text-xs"
+      class="flex flex-col items-center justify-center bg-transparent text-xs {$AppState
+        .view.tab == TabKind.SETTINGS
+        ? 'text-primary'
+        : 'text-white'}"
       on:click={() => {
         $AppState.view.tab = TabKind.SETTINGS;
       }}
@@ -53,7 +62,7 @@
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"
         fill="currentColor"
-        class="w-[3em]"
+        class="w-[2.5em]"
       >
         <path
           fill-rule="evenodd"
